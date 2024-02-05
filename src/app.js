@@ -1,22 +1,21 @@
-// 1. data.js 데이터를 담을 배열 초기화
 let todo = [];
 let $input = document.querySelector("input");
 let $button = document.querySelector("button");
-// 2. <ul></ul> 태그 안에 <li>todo data</li>를 추가하기 위해 <ul> 요소 선택
 let $listItem = document.getElementById("todo_list");
 let nextId = 1; // id값
 let newTask = ""; // 새로운 할일
 
-// localStorage에서 데이터 불러오기
-let storedTodos = JSON.parse(localStorage.getItem("todo-list"));
+// localStorage 데이터 받아오기
+function test() {
+  let storedTodos = JSON.parse(localStorage.getItem("todo-list"));
 
-if (storedTodos) {
-  // 'todo' 배열에 불러온 데이터 할당
-  todo = storedTodos;
+  if (storedTodos) {
+    todo = storedTodos;
+  }
+  reloadTodoList();
 }
 
-// 리스트 렌더링 함수 호출
-reloadTodoList();
+test();
 
 // 투두리스트 조회
 // 3. 받아온 데이터 순회해서 <li> 요소 추가하기
@@ -218,12 +217,11 @@ const handlerAddTodo = () => {
     return;
   }
 
-  // 새로고침시 id값이 1부터 다시 생성되는 이슈 방지
-  const currentId = todo.length > 0 ? todo[todo.length - 1].id : 0;
-  const newTodo = [...todo, { id: currentId + 1, task: newTask, done: false }];
+  // id값을 고유 식별자로 대체
+  let uuid = self.crypto.randomUUID();
+  const newTodo = [...todo, { id: uuid, task: newTask, done: false }];
   // 새로운 투두 추가
   setList(newTodo);
-  nextId++; // 객체 id 번호 증가
   $input.value = ""; // input value 초기화
   newTask = ""; // newTask value 초기화
   reloadTodoList();
