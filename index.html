@@ -5,6 +5,29 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>To Do List</title>
+    <!-- CSS  -->
+    <link rel="stylesheet" href="./style/reset.css" />
+    <link rel="stylesheet" href="./style/style.css" />
+    <!-- fontAwesome -->
+    <script
+      src="https://kit.fontawesome.com/97597fd0cf.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- js -->
+    <script src="./src/app.js" defer></script>
   </head>
-  <body></body>
+
+  <body>
+    <div class="wrap">
+      <section class="todo_app">
+        <h1 class="title">To Do List</h1>
+        <h2 class="ir">투두리스트 입력창</h2>
+        <div class="todo_input">
+          <input type="text" placeholder="할일을 입력해주세요." class="input" />
+          <button type="button" class="post_btn">등록하기</button>
+        </div>
+        <ul id="todo_list" class="list_wrap"></ul>
+      </section>
+    </div>
+  </body>
 </html>

@@ -1,0 +1,142 @@
+:root {
+  --font-size: 14px;
+}
+
+.wrap {
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #9070c0, #8fa5e5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.todo_app {
+  min-width: 600px;
+  margin: 0 auto;
+  padding: 26px 30px;
+  background-color: #fff;
+  border-radius: 26px;
+  height: 540px;
+}
+
+.title {
+  margin-bottom: 10px;
+}
+
+.todo_input {
+  display: flex;
+  justify-content: space-between;
+  background-color: #eaeaea;
+  border-radius: 30px;
+  height: 50px;
+  margin-bottom: 10px;
+}
+
+.todo_input .input {
+  flex: 1;
+  padding: 18px;
+  font-size: var(--font-size);
+  background-color: transparent;
+}
+
+.post_btn {
+  width: 90px;
+  background-color: #9070c0;
+  border-radius: 30px;
+  color: #fff;
+  font-size: var(--font-size);
+}
+
+.post_btn:hover {
+  background-color: #584278;
+}
+
+.list_wrap {
+  padding: 4px 14px 6px;
+}
+
+.list_wrap li {
+  padding: 6px;
+  font-size: var(--font-size);
+  user-select: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.list_wrap li > btn {
+  cursor: pointer;
+}
+
+.button_wrapper {
+  display: flex;
+  align-content: center;
+  align-items: center;
+}
+
+.button_wrapper .delete_btn,
+.edit_btn,
+.cancle_btn,
+.edit_done_btn {
+  padding-left: 16px;
+}
+
+.button_wrapper .delete_btn,
+.cancle_btn,
+.edit_done_btn {
+  font-size: 18px;
+}
+
+.button_wrapper .delete_btn:hover,
+.edit_btn:hover,
+.cancle_btn:hover,
+.edit_done_btn:hover {
+  color: gray;
+}
+
+.edit_input {
+  border-bottom: 1px solid gray;
+  padding: 6px 6px 6px 0;
+  font-size: var(--font-size);
+  width: 100%;
+}
+
+.checkbox_btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  position: absolute;
+  cursor: pointer;
+  background-image: url("../../assets/checkbox_off.svg");
+  background-size: cover;
+}
+
+.checkbox_btn.checked::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  position: relative;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  color: #fff;
+  background-image: url("../../assets/checkbox_on.svg");
+  background-size: cover;
+}
+
+.todo_wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.text_wrapper {
+  margin-left: 30px;
+}
+
+.text_wrapper.checked {
+  text-decoration: line-through;
+  color: #a9a9a9;
+}
