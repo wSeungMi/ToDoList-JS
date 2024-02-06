@@ -4,7 +4,9 @@
   <img width="100%" alt="preview_img" src="https://github.com/wSeungMi/ToDoList-JS/assets/104605709/ee5295d2-5e11-4d94-9854-d52cf541f061">
 </div>
 
-[![바로가기](https://img.shields.io/badge/사이트바로가기-592EC1?style=for-the-badge&logo=github&logoColor=white)](http://wseungmi.github.io/ToDoList-JS/)
+<a href="http://wseungmi.github.io/ToDoList-JS/" target="_blank">
+  <img src="https://img.shields.io/badge/사이트바로가기-592EC1?style=for-the-badge&logo=github&logoColor=white" alt="바로가기">
+</a>
 
 ## 🎯 Project Goal
 
@@ -26,22 +28,29 @@
 
 ### 1. 할일 완료, 삭제에 해당하는 고유 id값 부여
 
+<br />
+
 **🤔 문제 원인**  
-`새로고침 이후 객체 id값이 다시 1부터 들어가는 이슈`
+ **👉 새로고침 이후 객체 id값이 다시 1부터 들어가는 이슈**
 
 <img width="100%" alt="id_error" src="https://github.com/wSeungMi/ToDoList-JS/assets/104605709/a631f48f-4469-4cf9-bae1-bd132d3d7060">
 새로운 값을 등록할 때마다 객체의 id 값이 1씩 증가하게 되는데, 이때 새로고침을 하면 다시 초깃값인 1부터 값이 생성되는 문제점을 발견했습니다.
 
 <br />
- 
-**👍 해결 방법**  
+
 👀 기존 코드에서는 id값을 담는 변수인 `nextId`의 초깃값을 1로 주고, 데이터를 추가할 때마다 1이 증가하는 방식이었습니다.
+
 ```javascript
 let nextId = 1; // id값
 // ...
 const newTodo = [...todo, { id: nextId, task: newTask, done: false }];
 nextId++;
 ```
+
+<br />
+ 
+**👍 해결 방법**
+
 <br />
 
 **시도 1.** localStorage 마지막 데이터의 id 값 확인하기
