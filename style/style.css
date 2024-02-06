@@ -132,11 +132,11 @@
   align-items: center;
 }
 
-.text_wrapper {
+.todo_content {
   margin-left: 30px;
 }
 
-.text_wrapper.checked {
+.todo_content.checked {
   text-decoration: line-through;
   color: #a9a9a9;
 }

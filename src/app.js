@@ -1,92 +1,52 @@
-let todo = [];
-let $input = document.querySelector("input");
-let $button = document.querySelector("button");
-let $listItem = document.getElementById("todo_list");
-let nextId = 1; // id값
-let newTask = ""; // 새로운 할일
+let todos = [];
+const $input = document.querySelector("input");
+const $button = document.querySelector("button");
+const $listItem = document.getElementById("todo_list");
+let newTask = ""; // 새로운 할일 임시저장
 
-// localStorage 데이터 받아오기
-function test() {
+// 데이터 받아오기(localStorage)
+function init() {
   let storedTodos = JSON.parse(localStorage.getItem("todo-list"));
-
   if (storedTodos) {
-    todo = storedTodos;
+    todos = storedTodos;
   }
   reloadTodoList();
 }
 
-test();
+init();
 
-// 투두리스트 조회
-// 3. 받아온 데이터 순회해서 <li> 요소 추가하기
+// 리스트 조회
 function reloadTodoList() {
   $listItem.innerHTML = "";
 
   // 리스트 렌더링
-  todo.map((list) => {
-    // <li> 요소 노드 생성
+  todos.map((list) => {
     const $li = document.createElement("li");
     $li.setAttribute("key", list.id);
-    // <li>에 class 추가
     $li.classList.add("todo_item");
 
-    // 레이아웃을 위한 <span> 요소, wrapper 노드 생성
+    // 할일 내용
     const $todoWrapper = document.createElement("div");
     $todoWrapper.classList.add("todo_wrapper");
+
     const $span = document.createElement("span");
-    $span.classList.add("text_wrapper");
+    $span.classList.add("todo_content");
 
-    // 텍스트 노드 생성
     const liText = document.createTextNode(list.task);
-
-    // 체크박스 생성
     const $checkbox = document.createElement("div");
     $checkbox.classList.add("checkbox_btn");
-    $li.appendChild($checkbox);
 
-    // 텍스트 노드를 $span 요소의 자식 노드로 추가
+    $li.appendChild($checkbox);
     $span.appendChild(liText);
     $todoWrapper.appendChild($checkbox);
     $todoWrapper.appendChild($span);
-
-    // $buttonWrapper 요소를 $listItem 요소의 자식 노드로 추가
     $li.appendChild($todoWrapper);
     $listItem.appendChild($li);
 
-    // 할일 완료
-    $checkbox.addEventListener("click", () => completedTodo(list.id));
-
-    if (list.done) {
-      $checkbox.classList.add("checked");
-      $span.classList.add("checked");
-    }
-
-    // 버튼 wrapper 생성
+    // 할일 수정 버튼, 삭제 버튼
     const $buttonWrapper = document.createElement("div");
     $buttonWrapper.classList.add("button_wrapper");
 
-    // 삭제 버튼 추가
-    // <li> 요소 노드에 button 요소 노드 생성
-    const $deleteBtn = document.createElement("button");
-    $deleteBtn.classList.add("delete_btn");
-    $deleteBtn.insertAdjacentHTML(
-      "beforeend",
-      '<i class="fa-solid fa-xmark fa-1g"></i>'
-    );
-
-    // 사용자가 삭제하려고 선택한 리스트 번호 받아와서 함수 실행
-    $deleteBtn.addEventListener("click", () => {
-      // 삭제 전에 한번 더 확인하기
-      const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
-
-      if (isConfirmed) {
-        deleteItem(list.id);
-      } else {
-        return;
-      }
-    });
-
-    // 수정 버튼 추가
     const $editBtn = document.createElement("button");
     $editBtn.classList.add("edit_btn");
     $editBtn.insertAdjacentHTML(
@@ -94,123 +54,138 @@ function reloadTodoList() {
       '<i class="fa-solid fa-pen-to-square"></i>'
     );
 
-    // 사용자가 수정하려고 선택한 리스트 번호 받아와서 함수 실행
-    $editBtn.addEventListener("click", (e) => {
-      editItem(e, list.id);
-    });
+    const $deleteBtn = document.createElement("button");
+    $deleteBtn.classList.add("delete_btn");
+    $deleteBtn.insertAdjacentHTML(
+      "beforeend",
+      '<i class="fa-solid fa-xmark fa-1g"></i>'
+    );
 
     $buttonWrapper.appendChild($editBtn);
     $buttonWrapper.appendChild($deleteBtn);
     $li.appendChild($buttonWrapper);
+
+    // 할일 완료
+    $checkbox.addEventListener("click", () => handlecompletedTodo(list.id));
+
+    if (list.done) {
+      $checkbox.classList.add("checked");
+      $span.classList.add("checked");
+    }
+
+    // 할일 삭제
+    $deleteBtn.addEventListener("click", () => {
+      const isConfirmed = window.confirm("정말 삭제하시겠습니까?");
+
+      if (isConfirmed) {
+        handleDeleteTodo(list.id);
+      } else {
+        return;
+      }
+    });
+
+    // 할일 수정
+    $editBtn.addEventListener("click", (e) => {
+      handleEditTodo(e, list.id);
+    });
   });
 }
 
-// 할일 완료 함수
-const completedTodo = (listId) => {
-  const isCompleted = todo.map((list) =>
-    list.id === listId ? { ...list, done: !list.done } : list
+const handlecompletedTodo = (doneListId) => {
+  const isCompleted = todos.map((list) =>
+    list.id === doneListId ? { ...list, done: !list.done } : list
   );
   setList(isCompleted);
   reloadTodoList();
 };
 
-// 수정 함수
-const editItem = (e, listId) => {
-  // 수정하기 버튼을 클릭한 li 찾기
-  if (e.target.classList.contains("fa-pen-to-square")) {
-    // 버튼과 가장 인접한 li 요소 찾기
-    const $selectLi = e.target.closest("li");
-    // 텍스트 자리에 input 요소 노드 추가
+const handleEditTodo = (e, editListId) => {
+  const currentTargetElement = e.target;
+
+  if (currentTargetElement) {
+    const $selectTodo = e.target.closest("li");
     const $newInput = document.createElement("input");
     $newInput.classList.add("edit_input");
 
-    if ($selectLi) {
-      // 현재 li에 있는 텍스트 가져오기
-      const liTextContent = $selectLi.textContent;
-      // 기존 텍스트 지워주기
-      $selectLi.textContent = "";
+    const currentTextContent = $selectTodo.textContent;
+    $selectTodo.textContent = ""; // 기존 텍스트 삭제
+    $newInput.setAttribute("value", currentTextContent);
 
-      // 새로 생성한 input에 value값으로 기존 텍스트값 넣어주기
-      $newInput.setAttribute("value", liTextContent);
+    const $buttonWrapper = document.createElement("div");
+    $buttonWrapper.classList.add("button_wrapper");
 
-      // 버튼 wrapper 생성
-      const $buttonWrapper = document.createElement("div");
-      $buttonWrapper.classList.add("button_wrapper");
+    const $cancleBtn = document.createElement("button");
+    $cancleBtn.classList.add("cancle_btn");
+    $cancleBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<i class="fa-solid fa-xmark fa-1g"></i>'
+    );
 
-      // 입력 취소 버튼 추가
-      const $cancleBtn = document.createElement("button");
-      $cancleBtn.classList.add("cancle_btn");
-      $cancleBtn.insertAdjacentHTML(
-        "afterbegin",
-        '<i class="fa-solid fa-xmark fa-1g"></i>'
-      );
+    $cancleBtn.addEventListener("click", reloadTodoList);
 
-      $cancleBtn.addEventListener("click", reloadTodoList);
+    // 수정 완료 버튼 추가
+    const $editDoneBtn = document.createElement("button");
+    $editDoneBtn.classList.add("edit_done_btn");
+    $editDoneBtn.insertAdjacentHTML(
+      "afterbegin",
+      '<i class="fa-solid fa-check"></i>'
+    );
 
-      // 수정 완료 버튼 추가
-      const $editDoneBtn = document.createElement("button");
-      $editDoneBtn.classList.add("edit_done_btn");
-      $editDoneBtn.insertAdjacentHTML(
-        "afterbegin",
-        '<i class="fa-solid fa-check"></i>'
-      );
+    $editDoneBtn.addEventListener("click", () => {
+      if (editListId && $newInput.value !== "") {
+        const newEditTodo = todos.map((list) =>
+          list.id === editListId ? { ...list, task: $newInput.value } : list
+        );
+        setList(newEditTodo);
+        reloadTodoList();
+      } else {
+        alert("할일을 입력해주세요🙌!");
+        return;
+      }
+    });
 
-      // 수정 완료 버튼을 클릭하면, id값이 일치하는 데이터에 수정된 데이터를 다시 넣어준다.
-      $editDoneBtn.addEventListener("click", () => {
-        if (listId && $newInput.value !== "") {
-          // 기존 todo 목록을 가져와서 수정된 데이터로 업데이트 된 새 배열을 반환한다.
-          const newEditTodo = todo.map((list) =>
-            list.id === listId ? { ...list, task: $newInput.value } : list
-          );
-          setList(newEditTodo);
-          reloadTodoList();
-        } else {
-          alert("할일을 입력해주세요🙌!");
-          return;
-        }
-      });
+    $buttonWrapper.appendChild($editDoneBtn);
+    $buttonWrapper.appendChild($cancleBtn);
+    $selectTodo.appendChild($newInput);
+    $selectTodo.appendChild($buttonWrapper);
 
-      $buttonWrapper.appendChild($editDoneBtn);
-      $buttonWrapper.appendChild($cancleBtn);
-      $selectLi.appendChild($newInput);
-      $selectLi.appendChild($buttonWrapper);
-    }
+    // input Focus
+    const $focusInput = document.querySelector(".edit_input");
+    $focusInput.focus();
+    $focusInput.setSelectionRange(
+      $focusInput.value.length,
+      $focusInput.value.length
+    );
   }
 };
 
-// 삭제 함수
-const deleteItem = (listId) => {
-  // id값이 일치하는 객체를 제외하고 나머지 목록 받아오기
-  const updateList = todo.filter((list) => list.id !== listId);
+// 할일 삭제
+const handleDeleteTodo = (delListId) => {
+  const updateList = todos.filter((list) => list.id !== delListId);
   setList(updateList);
   reloadTodoList();
 };
 
-// input eventhandler 함수
-const onInput = (event) => {
-  newTask = event.target.value;
+// 할일 추가
+const setList = (newTodo) => {
+  todos = newTodo;
 
-  // enter key를 눌렀을 때도 handlerAddTodo() 실행하기
-  if (event.key === "Enter") {
-    if (event.isComposing) return;
+  if (!todos.length) {
+    localStorage.removeItem("todo-list");
+  } else {
+    localStorage.setItem("todo-list", JSON.stringify(todos));
+  }
+};
+
+const onInput = (e) => {
+  newTask = e.target.value;
+
+  if (e.key === "Enter") {
+    if (e.isComposing) return;
     handlerAddTodo(newTask);
   }
 };
 
-// 기존 배열에 새로운 데이터를 복사하는 함수
-const setList = (newTodo) => {
-  todo = newTodo;
-
-  // 이때, localStorage에도 데이터 함께 저장해주기
-  // 값이 없다면 데이터 삭제
-  if (!todo.length) {
-    localStorage.removeItem("todo-list");
-  } else {
-    localStorage.setItem("todo-list", JSON.stringify(todo));
-  }
-};
-
-// onclick eventhandler 함수
 const handlerAddTodo = () => {
   if (!newTask) {
     alert("할일을 입력해주세요🙌!");
@@ -219,17 +194,13 @@ const handlerAddTodo = () => {
 
   // id값을 고유 식별자로 대체
   let uuid = self.crypto.randomUUID();
-  const newTodo = [...todo, { id: uuid, task: newTask, done: false }];
-  // 새로운 투두 추가
+  const newTodo = [...todos, { id: uuid, task: newTask, done: false }];
   setList(newTodo);
   $input.value = ""; // input value 초기화
   newTask = ""; // newTask value 초기화
   reloadTodoList();
 };
 
-// 할일 추가
-// 1. 사용자 입력을 받아 변수에 저장하기
 $input.addEventListener("keydown", onInput);
-
-// 2. 등록하기 버튼을 누르면 todo 객체에 값 넣어주기
+$input.focus();
 $button.addEventListener("click", handlerAddTodo);
